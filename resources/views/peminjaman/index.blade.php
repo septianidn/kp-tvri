@@ -125,7 +125,9 @@
                 </button>
             </div>
             <div class="modal-body">
-
+                <form action="{{route('peminjaman/store')}}" method="POST">
+                @csrf
+                
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -135,10 +137,17 @@
                     </tr>
                     <tbody id="addBody">
                         <tr>
-                            <td><select name="barang" id="barangSelect" class="form-control">
-                                <option value="0">Pilih Barang</option>
-                            </select></td>
-                            <td><input type="number" name="qty" id="qtySelect" class="form-control"></td>
+                            <td><select name="barang[]" id="barangSelect" class="selectpicker" data-live-search="true">
+                                <option value="">Pilih Barang</option>
+                                @foreach ($barang as $brg)
+                                    <option value="{{$brg->id}}">{{$brg->nama_barang}}</option>
+                                @endforeach
+                            </select>
+                            <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-nama_barang"></div>
+                            </td>
+                            <td><input type="number" name="qty_barang[]" id="qtySelect" class="form-control">
+                            <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
+                            </td>
                             <td><button type="button" class="btn btn-primary" id="add_btn"><i class="fas fa-plus-square"></i></button></td>
                         </tr>
                     </tbody>
@@ -148,8 +157,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
-                <button type="button" class="btn btn-primary" id="store">SIMPAN</button>
+                <button type="submit" class="btn btn-primary" id="store">SIMPAN</button>
             </div>
+            </form>
         </div>
     </div>
 </div>
@@ -208,23 +218,34 @@
 @section('script')
 
 <script>
+    $(document).ready(function () {
+        $('select').selectpicker();
+    });
 
 
 $('#add_btn').on('click', function () {
+     
     var html = '';
     html += '<tr>';
-    html += '<td><select name="barang" id="barangSelect" class="form-control">\
-    <option value="0">Pilih Barang</option>\
+    html += '<td><select name="barang[]" id="barangSelect" class="selectpicker" data-live-search="true">\
+        <option value="">Pilih Barang</option>\
+        @foreach($barang as $brg)\
+        <option value="{{$brg->id}}">{{$brg->nama_barang}}</option>\
+        @endforeach\
     </select></td>';
-    html += '<td><input type="number" name="qty" id="qtySelect" class="form-control"></td>';
+    html += '<td><input type="number" name="qty_barang[]" id="qtySelect" class="form-control"></td>';
     html += '<td><button type="button" class="btn btn-danger" id="remove_btn"><i class="fas fa-minus-square"></i></button></td>';
     html += '</tr>';
 
     $('#addBody').append(html);
+    $('select').selectpicker('refresh');
         });
+
     $(document).on('click', '#remove_btn', function () {
         $(this).closest('tr').remove();
     });
+
+
     
 
 
@@ -278,13 +299,26 @@ $('input[type=number]').on('keydown', function (e) {
     //action create post
     $('#store').click(function(e) {
         e.preventDefault();
+        let barang = [];
+        let qty = [];
+
+        $("select[name^='barang']").each(function () {
+            barang.push($(this).val());
+            });
+
+        $("input[name^='qty_barang']").each(function () {
+            qty.push($(this).val());
+            });
+
+            
+                console.log(barang, qty);
 
         //define variable
-        let nama_barang   = $('#nama_barang').val();
-        let jenis   = $('#jenis').val();
-        let merk   = $('#merk').val();
-        let qty   = $('#qty').val();
-        let token   = $("meta[name='csrf-token']").attr("content");
+//         let nama_barang   = $('#nama_barang').val();
+//         let jenis   = $('#jenis').val();
+//         let merk   = $('#merk').val();
+//         let qty   = $('#qty').val();
+//         let token   = $("meta[name='csrf-token']").attr("content");
 
         $.ajaxSetup({
                 headers: {
@@ -294,26 +328,23 @@ $('input[type=number]').on('keydown', function (e) {
         //ajax
         $.ajax({
 
-            url: `/barang`,
+            url: `/peminjaman/store`,
             type: "POST",
             cache: false,
             data: {
-                "nama_barang": nama_barang,
-                "jenis": jenis,
-                "merk": merk,
-                "qty": qty,
-                "token": token
+                "nama_barang": barang,
+                "qty": qty
             },
             success:function(response){
-
                 //show success message
-                Swal.fire({
-                    type: 'success',
-                    icon: 'success',
-                    title: `${response.message}`,
-                    showConfirmButton: false,
-                    timer: 2000
-                });
+                console.log(response);
+                // Swal.fire({
+                //     type: 'success',
+                //     icon: 'success',
+                //     title: `${response.message}`,
+                //     showConfirmButton: false,
+                //     timer: 2000
+                // });
                 
 
                 //data post
@@ -336,10 +367,8 @@ $('input[type=number]').on('keydown', function (e) {
                 // $('#table-barang').append(post);
                 
                 //clear form
-                $('#nama_barang').val('');
-                $('#jenis').val('');
-                $('#merk').val('');
-                $('#jumlah').val('');
+                $('#barangSelect').val('');
+                $('#qtySelect').val('');
 
                 //close modal
                 $('#modal-create').modal('hide');
@@ -347,7 +376,7 @@ $('input[type=number]').on('keydown', function (e) {
 
             },
             error:function(error){
-                console.log(error.responseJSON);
+                console.log(error.responseJSON.nama_barang[0]);
                 if(error.responseJSON.nama_barang[0]) {
 
                     //show alert
@@ -357,26 +386,6 @@ $('input[type=number]').on('keydown', function (e) {
                     //add message to alert
                     $('#alert-nama_barang').html(error.responseJSON.nama_barang[0]);
                 } 
-
-                if(error.responseJSON.jenis[0]) {
-
-                    //show alert
-                    $('#alert-jenis').removeClass('d-none');
-                    $('#alert-jenis').addClass('d-block');
-
-                    //add message to alert
-                    $('#alert-jenis').html(error.responseJSON.jenis[0]);
-                }
-                
-                if(error.responseJSON.merk[0]) {
-
-                    //show alert
-                    $('#alert-merk').removeClass('d-none');
-                    $('#alert-merk').addClass('d-block');
-
-                    //add message to alert
-                    $('#alert-merk').html(error.responseJSON.merk[0]);
-                }
                 if(error.responseJSON.qty[0]) {
 
                     //show alert
@@ -390,7 +399,7 @@ $('input[type=number]').on('keydown', function (e) {
             }
 
         });
-tampilData();
+// tampilData();
     });
 
 

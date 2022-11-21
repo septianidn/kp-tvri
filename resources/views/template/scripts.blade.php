@@ -4,6 +4,8 @@
 
     <!-- Core plugin JavaScript-->
     <script src="{{asset('template/vendor/jquery-easing/jquery.easing.min.js')}}"></script>
+    <script src="{{asset('template/popper.min.js')}}" crossorigin="anonymous"></script>
+
 
     <!-- Custom scripts for all pages-->
     <script src="{{asset('template/js/sb-admin-2.min.js')}}"></script>
@@ -15,6 +17,8 @@
     <!-- Page level custom scripts -->
     <script src="{{asset('template/js/demo/datatables-demo.js')}}"></script>
     <script src="{{asset('template/sweetalert2.all.min.js')}}"></script>
+    <script src="{{asset('template/bootstrap-select.min.js')}}"></script>
+
     
 
     @yield('script')

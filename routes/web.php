@@ -32,3 +32,4 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
 Route::get('/peminjaman/get', [PeminjamanController::class, 'get'])->name('peminjaman/get');
+Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman/store');

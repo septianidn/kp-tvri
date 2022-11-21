@@ -23,6 +23,9 @@
 
     <!-- Custom styles for this page -->
     <link href="{{asset('template/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+    <link rel="stylesheet" href="{{asset('template/bootstrap-select.min.css')}}">
+
+
 
 </head>
 

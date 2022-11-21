@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 class PeminjamanController extends Controller
 {
@@ -15,9 +17,9 @@ class PeminjamanController extends Controller
      */
     public function index()
     {
-        
+        $barang = Barang::all();
 
-        return view('peminjaman.index');
+        return view('peminjaman.index', compact('barang'));
     }
 
     public function get(){
@@ -44,7 +46,25 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = array(
+            'nama_barang' => 'required|numeric|min:1',
+            'qty' => 'required|numeric|min:1',
+        );    
+        $messages = array(
+                        'nama_barang.numeric' => 'Silahkan Pilih Item!.',
+                        'qty.numeric' => 'Masukkan Angka!.',
+
+                    );
+          $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()){
+           return response()->json($validator->errors(), 422);
+        }
+
+       return response()->json([
+    'success' => true,
+    'message' => 'Data Berhasil Disimpan!',
+]);
     }
 
     /**
