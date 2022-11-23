@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\DetailPeminjaman;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -18,14 +20,15 @@ class PeminjamanController extends Controller
     public function index()
     {
         $barang = Barang::all();
+        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi', 'users.name', 'peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'peminjaman.status_peminjaman', 'peminjaman.jumlah_barang')->join('users', 'users.id' , '=', 'peminjaman.id_peminjam')->get();
 
-        return view('peminjaman.index', compact('barang'));
+        return view('peminjaman.index', compact('barang', 'peminjaman'));
     }
 
     public function get(){
-        $barang = Barang::all();
+        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi', 'users.name', 'peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'peminjaman.status_peminjaman', 'peminjaman.jumlah_barang')->join('users', 'users.id' , '=', 'peminjaman.id_peminjam')->get();
 
-        return response()->json($barang);
+        return response()->json($peminjaman);
     }
 
     /**
@@ -45,25 +48,70 @@ class PeminjamanController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {   
+         foreach ($request as $brg) {
+            $qty = $request->qty;
+
+            $stok = Barang::select('barang.qty')->where('id', '=', $request->barang)->get();
+            if($stok->isEmpty()){
+
+            }
+            if($qty > $stok){
+                return response()->json([
+                'success' => true,
+                'message' => 'Jumlah barang tidak mencukupi!' 
+            ]);
+            }
+        }
+
         $rules = array(
-            'nama_barang' => 'required|numeric|min:1',
-            'qty' => 'required|numeric|min:1',
+            'tanggal' => 'required|date',
+            'acara' => 'required|max:50',
+            'lokasi' => 'required|max:50',
+            'nama_barang' => 'required|min:1',
+            'nama_barang.*' => 'distinct|min:1',
+            'qty.*' => 'min:1',
+            'qty' => 'required|min:1',
         );    
         $messages = array(
-                        'nama_barang.numeric' => 'Silahkan Pilih Item!.',
-                        'qty.numeric' => 'Masukkan Angka!.',
-
-                    );
-          $validator = Validator::make($request->all(), $rules, $messages);
+            'acara.required' => 'Masukkan Acara!',
+            'lokasi.required' => 'Masukkan Lokasi!',
+            'nama_barang' => 'Silahkan Pilih Item yang akan dipinjam!.',
+            'nama_barang.*.distinct' => 'Silahkan Pilih Item yang Berbeda!.',
+            'nama_barang.*.min' => 'Silahkan Pilih Item yang akan dipinjam!.',
+            'qty.*.min' => 'Masukkan Jumlah unit yang akan dipinjam!.',
+            'tanggal.required' => 'Masukkan Tanggal!' 
+            
+        );
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()){
            return response()->json($validator->errors(), 422);
         }
+        $user = Auth::user();
+
+        
+        $peminjaman = Peminjaman::create([
+            'id_peminjam' => $user->id,
+            'tanggal_pengembalian' => $request->tanggal,
+            'acara' => $request->acara,
+            'lokasi' => $request->lokasi,
+            'tanggal_peminjaman' => date('Y-m-d'),
+            'jumlah_barang' => $request->jumlah,
+            'status_peminjaman' => 'Dipinjam'
+        ]);
+
+        $detailPeminjaman = Peminjaman::latest()->first();
+
+        $detailPeminjaman->barang()->attach($request->nama_barang, [
+            'jumlah' => $request->jumlah,
+            'keterangan' =>'-',
+         ]);
 
        return response()->json([
     'success' => true,
     'message' => 'Data Berhasil Disimpan!',
+    'data' => $peminjaman
 ]);
     }
 
@@ -75,7 +123,9 @@ class PeminjamanController extends Controller
      */
     public function show($id)
     {
-        //
+        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi','peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'barang_peminjaman.keterangan', 'barang.kondisi', 'users.name', 'barang_peminjaman.jumlah')->join('users', 'users.id', '=', 'peminjaman.id_peminjam')->join('barang_peminjaman', 'peminjaman.id', '=', 'barang_peminjaman.peminjaman_id')->join('barang' , 'barang.id', '=', 'barang_peminjaman.barang_id')->get();
+
+        return view('peminjaman.cetak', compact('peminjaman'));
     }
 
     /**
@@ -109,6 +159,13 @@ class PeminjamanController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $peminjaman = Peminjaman::findOrFail($id);
+        $peminjaman->barang()->detach();
+        $peminjaman->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Data Post Berhasil Dihapus!.',
+        ]); 
     }
 }

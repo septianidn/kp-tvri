@@ -32,6 +32,7 @@
                                             <th>Jenis</th>
                                             <th>Merk</th>
                                             <th>Jumlah</th>
+                                            <th>Kondisi</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
@@ -42,6 +43,7 @@
                                             <th>Jenis</th>
                                             <th>Merk</th>
                                             <th>Jumlah</th>
+                                            <th>Kondisi</th>
                                             @auth
                                             <th>Aksi</th>
                                             @endauth
@@ -55,6 +57,7 @@
                                         <td>{{$brg->jenis}}</td>
                                         <td>{{$brg->merk}}</td>
                                         <td>{{$brg->qty}}</td>
+                                        <td>{{$brg->kondisi}}</td>
                                         <td class="text-center">
                                         <a href="javascript:void(0)" id="btn-edit-post" data-id="{{ $brg->id }}" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>
                                         <a href="javascript:void(0)" id="btn-delete-post" data-id="{{ $brg->id }}" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>
@@ -152,6 +155,12 @@
                     <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
                 </div>
 
+                <div class="form-group">
+                    <label for="kondisi" class="control-label">Kondisi Barang</label>
+                    <input type="text" class="form-control" id="kondisi" name="kondisi">
+                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-kondisi"></div>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
@@ -198,6 +207,12 @@
                     <label for="qty_edit" class="control-label">Jumlah</label>
                     <input type="number" class="form-control" id="qty_edit" name="qty_edit">
                     <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty-edit"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="kondisi_edit" class="control-label">Kondisi Barang</label>
+                    <input type="text" class="form-control" id="kondisi_edit" name="kondisi_edit">
+                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-kondisi-edit"></div>
                 </div>
                 
 
@@ -247,12 +262,14 @@ $('input[type=number]').on('keydown', function (e) {
                      jenis = data[key].jenis;
                      merk = data[key].merk;
                      qty = data[key].qty;
+                     kondisi = data[key].kondisi;
                      $('tbody').append('<tr>\
                      <td>'+parseInt(key+1)+'</td>\
                      <td>'+nama_barang+'</td>\
                      <td>'+jenis+'</td>\
                      <td>'+merk+'</td>\
                      <td>'+qty+'</td>\
+                     <td>'+kondisi+'</td>\
                      <td class="text-center">\
                         <a href="javascript:void(0)" id="btn-edit-post" data-id='+id+'" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>\
                         <a href="javascript:void(0)" id="btn-delete-post" data-id='+id+'" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>\
@@ -272,6 +289,7 @@ $('input[type=number]').on('keydown', function (e) {
         let jenis   = $('#jenis').val();
         let merk   = $('#merk').val();
         let qty   = $('#qty').val();
+        let kondisi   = $('#kondisi').val();
         let token   = $("meta[name='csrf-token']").attr("content");
 
         $.ajaxSetup({
@@ -290,6 +308,7 @@ $('input[type=number]').on('keydown', function (e) {
                 "jenis": jenis,
                 "merk": merk,
                 "qty": qty,
+                "kondisi": kondisi,
                 "token": token
             },
             success:function(response){
@@ -303,31 +322,12 @@ $('input[type=number]').on('keydown', function (e) {
                     timer: 2000
                 });
                 
-
-                //data post
-                // let iterasi = $("table[id='dataTable'] > tbody >tr").length
-                // let post = `
-                //     <tr id="index_${response.data.id}">
-                //         <td>${iterasi + 1}</td>
-                //         <td>${response.data.nama_barang}</td>
-                //         <td>${response.data.jenis}</td>
-                //         <td>${response.data.merk}</td>
-                //         <td>${response.data.qty}</td>
-                //         <td class="text-center">
-                //             <a href="javascript:void(0)" id="btn-edit-post" data-id="${response.data.id}" class="btn btn-primary btn-sm">EDIT</a>
-                //             <a href="javascript:void(0)" id="btn-delete-post" data-id="${response.data.id}" class="btn btn-danger btn-sm">DELETE</a>
-                //         </td>
-                //     </tr>
-                // `;
-                
-                //append to table
-                // $('#table-barang').append(post);
-                
                 //clear form
                 $('#nama_barang').val('');
                 $('#jenis').val('');
                 $('#merk').val('');
-                $('#jumlah').val('');
+                $('#qty').val('');
+                $('#kondisi').val('');
 
                 //close modal
                 $('#modal-create').modal('hide');
@@ -374,6 +374,15 @@ $('input[type=number]').on('keydown', function (e) {
                     //add message to alert
                     $('#alert-qty').html(error.responseJSON.qty[0]);
                 }
+                if(error.responseJSON.kondisi[0]) {
+
+                    //show alert
+                    $('#alert-kondisi').removeClass('d-none');
+                    $('#alert-kondisi').addClass('d-block');
+
+                    //add message to alert
+                    $('#alert-kondisi').html(error.responseJSON.kondisi[0]);
+                }
 
             }
 
@@ -401,6 +410,7 @@ tampilData();
                 $('#jenis_edit').val(response.data.jenis);
                 $('#merk_edit').val(response.data.merk);
                 $('#qty_edit').val(response.data.qty);
+                $('#kondisi_edit').val(response.data.kondisi);
 
                 //open modal
                 $('#modal-edit').modal('show');
@@ -418,6 +428,7 @@ tampilData();
         let jenis = $('#jenis_edit').val();
         let merk = $('#merk_edit').val();
         let qty = $('#qty_edit').val();
+        let kondisi = $('#kondisi_edit').val();
         let token   = $("meta[name='csrf-token']").attr("content");
         
         $.ajaxSetup({
@@ -436,6 +447,7 @@ tampilData();
                 "jenis": jenis,
                 "merk": merk,
                 "qty": qty,
+                "kondisi": kondisi,
                 "token": token
             },
             success:function(response){
@@ -448,21 +460,6 @@ tampilData();
                     showConfirmButton: false,
                     timer: 2000
                 });
-
-                //data post
-                // let post = `
-                //     <tr id="index_${response.data.id}">
-                //         <td>${response.data.title}</td>
-                //         <td>${response.data.content}</td>
-                //         <td class="text-center">
-                //             <a href="javascript:void(0)" id="btn-edit-post" data-id="${response.data.id}" class="btn btn-primary btn-sm">EDIT</a>
-                //             <a href="javascript:void(0)" id="btn-delete-post" data-id="${response.data.id}" class="btn btn-danger btn-sm">DELETE</a>
-                //         </td>
-                //     </tr>
-                // // `;
-                
-                // //append to post data
-                // $(`#index_${response.data.id}`).replaceWith(post);
 
                 //close modal
                 $('#modal-edit').modal('hide');
@@ -509,6 +506,15 @@ tampilData();
 
                     //add message to alert
                     $('#alert-qty-edit').html(error.responseJSON.qty[0]);
+                }
+                if(error.responseJSON.kondisi[0]) {
+
+                    //show alert
+                    $('#alert-kondisi-edit').removeClass('d-none');
+                    $('#alert-kondisi-edit').addClass('d-block');
+
+                    //add message to alert
+                    $('#alert-kondisi-edit').html(error.responseJSON.kondisi[0]);
                 }
 
             }

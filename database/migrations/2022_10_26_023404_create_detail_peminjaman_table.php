@@ -13,21 +13,17 @@ class CreateDetailPeminjamanTable extends Migration
      */
     public function up()
     {
-        Schema::create('detail_peminjaman', function (Blueprint $table) {
+        Schema::create('barang_peminjaman', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('id_peminjaman'); 
-            $table->unsignedInteger('id_peminjam'); 
-            $table->unsignedInteger('id_barang'); 
-            $table->string('kondisi')->nullable(); 
-            $table->string('keterangan');
-            $table->index('id_peminjaman');
-            $table->index('id_barang');
-            $table->index('id_peminjam');
-            $table->foreign('id_peminjaman')->references('id')->on('peminjaman')
+            $table->unsignedInteger('peminjaman_id'); 
+            $table->unsignedInteger('barang_id'); 
+            $table->integer('jumlah'); 
+            $table->string('keterangan')->nullable();
+            $table->index('peminjaman_id');
+            $table->index('barang_id');
+            $table->foreign('peminjaman_id')->references('id')->on('peminjaman')
             ->onDelete('cascade')->onUpdate('cascade'); 
-            $table->foreign('id_barang')->references('id')->on('barang')
-            ->onDelete('cascade')->onUpdate('cascade'); 
-            $table->foreign('id_peminjam')->references('id')->on('users')
+            $table->foreign('barang_id')->references('id')->on('barang')
             ->onDelete('cascade')->onUpdate('cascade'); 
             $table->timestamps();
         });

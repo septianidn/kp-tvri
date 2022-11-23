@@ -14,13 +14,19 @@ class CreatePeminjamanTable extends Migration
     public function up()
     {
         Schema::create('peminjaman', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id');   
+            $table->unsignedInteger('id_peminjam'); 
             $table->date('tanggal_peminjaman');
             $table->date('tanggal_pengembalian');
             $table->integer('jumlah_barang');
-            $table->string('nama_peminjam');
+            $table->string('acara')->nullable();
+            $table->string('lokasi')->nullable();
             $table->string('status_peminjaman');
             $table->timestamps();
+            
+            $table->index('id_peminjam');
+            $table->foreign('id_peminjam')->references('id')->on('users')
+            ->onDelete('cascade')->onUpdate('cascade'); 
         });
     }
 

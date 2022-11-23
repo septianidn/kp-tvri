@@ -42,23 +42,18 @@ class BarangController extends Controller
 
         return response()->json($data);
     }
+
+   
     public function store(Request $request)
     {
-        
-        
-        // $validated = $request->validate( [
-        //     'nama_barang' => 'required|max:55',
-        //     'jenis' => 'required|max:55',
-        //     'merk' => 'required|max:55',
-        //     'qty' => 'required',
-        // ]);
-
+       
         
         $validator = Validator::make($request->all(), [
             'nama_barang' => 'required|max:55',
             'jenis' => 'required|max:55',
             'merk' => 'required|max:55',
             'qty' => 'required',
+            'kondisi' => 'required',
         ]);
 
         if ($validator->fails()){
@@ -70,14 +65,9 @@ class BarangController extends Controller
             'jenis'   => $request->jenis,
             'merk'   => $request->merk,
             'qty'   => $request->qty,
+            'kondisi'   => $request->kondisi,
         ]);
-        
-        // $data = new Barang();
-        // $data->nama_barang = $validated['nama'];
-        // $data->jenis = $validated['jenis'];
-        // $data->merk = $validated['merk'];
-        // $data->qty = $validated['jumlah'];
-        // $data->save();
+
 
         return response()->json([
     'success' => true,
@@ -131,6 +121,7 @@ class BarangController extends Controller
             'jenis'   => 'required',
             'merk'   => 'required',
             'qty'   => 'required',
+            'kondisi'   => 'required',
         ]);
 
         //check if validation fails
@@ -143,7 +134,8 @@ class BarangController extends Controller
             'nama_barang'     => $request->nama_barang, 
             'jenis'   => $request->jenis,
             'merk'   => $request->merk,
-            'qty'   => $request->qty
+            'qty'   => $request->qty,
+            'kondisi'   => $request->kondisi
         ]);
 
         //return response
