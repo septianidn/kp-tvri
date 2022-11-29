@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDetailPeminjamanTable extends Migration
+class CreateDetailTransaksiTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,14 @@ class CreateDetailPeminjamanTable extends Migration
      */
     public function up()
     {
-        Schema::create('barang_peminjaman', function (Blueprint $table) {
+        Schema::create('detail_transaksi', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('peminjaman_id'); 
+            $table->unsignedInteger('transaksi_id'); 
             $table->unsignedInteger('barang_id'); 
             $table->integer('jumlah'); 
             $table->string('keterangan')->nullable();
-            $table->index('peminjaman_id');
-            $table->index('barang_id');
-            $table->foreign('peminjaman_id')->references('id')->on('peminjaman')
+            $table->string('jenis_transaksi')->nullable()->default('peminjaman');
+            $table->foreign('transaksi_id')->references('id')->on('transaksi')
             ->onDelete('cascade')->onUpdate('cascade'); 
             $table->foreign('barang_id')->references('id')->on('barang')
             ->onDelete('cascade')->onUpdate('cascade'); 
@@ -36,6 +35,10 @@ class CreateDetailPeminjamanTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('detail_peminjaman');
+        Schema::table('detail_transaksi', function (Blueprint $table) {
+            $table->dropForeign(['barang_id']);
+            $table->dropColumn('barang_id');
+        });
+        Schema::dropIfExists('detail_transaksi');
     }
 }

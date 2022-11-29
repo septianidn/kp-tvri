@@ -21,6 +21,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
+        'address',
         'password',
     ];
 
@@ -44,6 +46,6 @@ class User extends Authenticatable
     ];
 
     public function peminjaman(){
-        return $this->hasMany(Peminjaman::class,'id_user');
+        return $this->hasMany(Peminjaman::class,'id_peminjam');
     }
 }

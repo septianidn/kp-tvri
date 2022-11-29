@@ -20,13 +20,13 @@ class PeminjamanController extends Controller
     public function index()
     {
         $barang = Barang::all();
-        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi', 'users.name', 'peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'peminjaman.status_peminjaman', 'peminjaman.jumlah_barang')->join('users', 'users.id' , '=', 'peminjaman.id_peminjam')->get();
+        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi', 'users.name', 'transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'transaksi.status_peminjaman', 'transaksi.jumlah_barang')->join('users', 'users.id' , '=', 'transaksi.id_peminjam')->get();
 
         return view('peminjaman.index', compact('barang', 'peminjaman'));
     }
 
     public function get(){
-        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi', 'users.name', 'peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'peminjaman.status_peminjaman', 'peminjaman.jumlah_barang')->join('users', 'users.id' , '=', 'peminjaman.id_peminjam')->get();
+       $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi', 'users.name', 'transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'transaksi.status_peminjaman', 'transaksi.jumlah_barang')->join('users', 'users.id' , '=', 'transaksi.id_peminjam')->get();
 
         return response()->json($peminjaman);
     }
@@ -52,15 +52,16 @@ class PeminjamanController extends Controller
          foreach ($request as $brg) {
             $qty = $request->qty;
 
-            $stok = Barang::select('barang.qty')->where('id', '=', $request->barang)->get();
-            if($stok->isEmpty()){
-
-            }
-            if($qty > $stok){
+            $stok = Barang::select('barang.qty','barang.nama_barang')->where('id', '=', $request->nama_barang)->first();
+            if(!$stok->exists()){
                 return response()->json([
-                'success' => true,
-                'message' => 'Jumlah barang tidak mencukupi!' 
-            ]);
+                'message' => 'Jumlah barang'.$stok->nama_barang.' kosong!' 
+            ],422);
+            }
+            if($qty > $stok->qty){
+                return response()->json([
+                'message' => 'Jumlah barang '.$stok->nama_barang.' tidak mencukupi!' 
+            ],422);
             }
         }
 
@@ -123,7 +124,7 @@ class PeminjamanController extends Controller
      */
     public function show($id)
     {
-        $peminjaman = Peminjaman::select('peminjaman.id', 'peminjaman.acara', 'peminjaman.lokasi','peminjaman.tanggal_pengembalian', 'peminjaman.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'barang_peminjaman.keterangan', 'barang.kondisi', 'users.name', 'barang_peminjaman.jumlah')->join('users', 'users.id', '=', 'peminjaman.id_peminjam')->join('barang_peminjaman', 'peminjaman.id', '=', 'barang_peminjaman.peminjaman_id')->join('barang' , 'barang.id', '=', 'barang_peminjaman.barang_id')->get();
+        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi','transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'detail_transaksi.keterangan', 'barang.kondisi', 'users.name', 'detail_transaksi.jumlah')->join('users', 'users.id', '=', 'transaksi.id_peminjam')->join('detail_transaksi', 'transaksi.id', '=', 'detail_transaksi.transaksi_id')->join('barang' , 'barang.id', '=', 'detail_transaksi.barang_id')->get();
 
         return view('peminjaman.cetak', compact('peminjaman'));
     }

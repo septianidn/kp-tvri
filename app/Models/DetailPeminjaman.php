@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DetailPeminjaman extends Pivot
 {
-    protected $table = 'barang_peminjaman';
+    protected $table = 'detail_transaksi';
 
-    protected $fillable = ['barang_id', 'peminjaman_id', 'jumlah', 'kondisi', 'keterangan'];
+    protected $fillable = ['barang_id', 'transaksi_id', 'jumlah', 'kondisi', 'keterangan'];
+    
 
 
 }

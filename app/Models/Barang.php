@@ -13,6 +13,6 @@ class Barang extends Model
 
 
     public function peminjaman(){
-        return $this->belongsToMany(Peminjaman::class)->using(DetailPeminjaman::class);
+        return $this->belongsToMany(Peminjaman::class,'detail_transaksi','barang_id','transaksi_id')->as('detail_transaksi')->withPivot('jumlah','keterangan','jenis_transaksi');
     }
 }

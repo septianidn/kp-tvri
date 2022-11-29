@@ -16,17 +16,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('dashboard');
-Route::get('/barang', [BarangController::class, 'index'])->name('barang')->middleware('is_admin');
-Route::post('/barang', [BarangController::class, 'store'])->name('barang/store');
-Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get');
-Route::get('/barang/{id}', [BarangController::class, 'show'])->name('/barang/edit');
-Route::put('/barang/{id}/edit', [BarangController::class, 'update'])->name('/barang/update');
-Route::delete('/barang/{id}/delete', [BarangController::class, 'destroy'])->name('/barang/delete');
-
-
-//Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 Auth::routes();
+Route::get('/logout', function(){
+    return abort(404);
+})->name('logout');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+Route::get('/barang', [BarangController::class, 'index'])->name('barang');
+Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get');
+
+    Route::middleware(['is_admin'])->group(function () {
+        Route::post('/barang', [BarangController::class, 'store'])->name('barang/store');
+        Route::get('/barang/{id}', [BarangController::class, 'show'])->name('/barang/edit');
+        Route::put('/barang/{id}/edit', [BarangController::class, 'update'])->name('/barang/update');
+        Route::delete('/barang/{id}/delete', [BarangController::class, 'destroy'])->name('/barang/delete');
+    });
+
+
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -35,3 +41,5 @@ Route::get('/peminjaman/get', [PeminjamanController::class, 'get'])->name('pemin
 Route::get('/peminjaman/detail/{id}', [PeminjamanController::class, 'show'])->name('peminjaman/show');
 Route::delete('/peminjaman/{id}/delete', [PeminjamanController::class, 'destroy'])->name('peminjaman/delete');
 Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman/store');
+
+});
