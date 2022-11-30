@@ -49,21 +49,13 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {   
-         foreach ($request as $brg) {
-            $qty = $request->qty;
-
-            $stok = Barang::select('barang.qty','barang.nama_barang')->where('id', '=', $request->nama_barang)->first();
-            if(!$stok->exists()){
-                return response()->json([
-                'message' => 'Jumlah barang'.$stok->nama_barang.' kosong!' 
-            ],422);
-            }
-            if($qty > $stok->qty){
-                return response()->json([
-                'message' => 'Jumlah barang '.$stok->nama_barang.' tidak mencukupi!' 
-            ],422);
-            }
-        }
+        // $jumlah=0;
+        // foreach($request->qty as $qty){
+        //     $jumlah += $qty;
+        // }
+        // return response()->json($jumlah,422);
+        
+         
 
         $rules = array(
             'tanggal' => 'required|date',
@@ -89,6 +81,28 @@ class PeminjamanController extends Controller
         if ($validator->fails()){
            return response()->json($validator->errors(), 422);
         }
+        foreach ($request->qty as $key => $brg) {
+            $qty = $brg;
+            $stok = Barang::select('barang.qty','barang.nama_barang')->where('id', '=', $request->nama_barang[$key])->first();
+            
+            if(!$stok->exists()){
+                return response()->json([
+                'message' => 'Jumlah barang'.$stok->nama_barang.' kosong!' 
+            ],422);
+            }
+            
+            if($stok->qty == 0){
+                return response()->json([
+                'message' => 'Jumlah barang '.$stok->nama_barang.' Kosong!' 
+            ],422);
+            }
+            if($request->qty[$key] > $stok->qty){
+                
+                return response()->json([
+                'message' => 'Jumlah barang '.$stok->nama_barang.' tidak mencukupi!' 
+            ],422);
+            }
+        }
         $user = Auth::user();
 
         
@@ -102,12 +116,18 @@ class PeminjamanController extends Controller
             'status_peminjaman' => 'Dipinjam'
         ]);
 
-        $detailPeminjaman = Peminjaman::latest()->first();
+        
 
-        $detailPeminjaman->barang()->attach($request->nama_barang, [
-            'jumlah' => $request->jumlah,
-            'keterangan' =>'-',
-         ]);
+
+        $detailPeminjaman = Peminjaman::latest()->first();
+        $jumlah = [];
+        foreach($request->nama_barang as $key => $barang){
+               $jumlah[$barang] = ['jumlah' => $request->qty[$key], 'keterangan' => '-'];
+               Barang::where('id', $barang)->decrement('qty', $request->qty[$key]);
+            }
+            $detailPeminjaman->barang()->attach($jumlah);
+
+        
 
        return response()->json([
     'success' => true,

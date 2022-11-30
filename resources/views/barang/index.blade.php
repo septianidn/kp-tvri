@@ -10,13 +10,14 @@
 
                     <!-- Page Heading -->
                     <h1 class="h3 mb-2 text-gray-800">Halaman Data Barang</h1>
-
+                     @if (auth()->user()->role == "Admin")
                     <div class="col-lg-8">
                         <a href="javascript:void(0)" class="btn btn-success mb-2" id="btn-create-post">Tambah +</a>
                         <div id="read" class="mt-3">
 
                         </div>
                     </div>
+                    @endif
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -33,7 +34,9 @@
                                             <th>Merk</th>
                                             <th>Jumlah</th>
                                             <th>Kondisi</th>
+                                             @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -44,9 +47,9 @@
                                             <th>Merk</th>
                                             <th>Jumlah</th>
                                             <th>Kondisi</th>
-                                            @auth
+                                             @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endauth
+                                            @endif
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-barang">
@@ -58,10 +61,12 @@
                                         <td>{{$brg->merk}}</td>
                                         <td>{{$brg->qty}}</td>
                                         <td>{{$brg->kondisi}}</td>
+                                         @if (auth()->user()->role == "Admin")
                                         <td class="text-center">
                                         <a href="javascript:void(0)" id="btn-edit-post" data-id="{{ $brg->id }}" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>
                                         <a href="javascript:void(0)" id="btn-delete-post" data-id="{{ $brg->id }}" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>
                                         </td>
+                                        @endif
                                        </tr>   
                                        @endforeach
                                     </tbody>
@@ -270,10 +275,12 @@ $('input[type=number]').on('keydown', function (e) {
                      <td>'+merk+'</td>\
                      <td>'+qty+'</td>\
                      <td>'+kondisi+'</td>\
+                      @if (auth()->user()->role == "Admin")\
                      <td class="text-center">\
                         <a href="javascript:void(0)" id="btn-edit-post" data-id='+id+'" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>\
                         <a href="javascript:void(0)" id="btn-delete-post" data-id='+id+'" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>\
                     </td>\
+                    @endif\
                     </tr>');
                 });
             }

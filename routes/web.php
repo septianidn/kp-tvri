@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PeminjamanController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BarangController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,5 +42,10 @@ Route::get('/peminjaman/get', [PeminjamanController::class, 'get'])->name('pemin
 Route::get('/peminjaman/detail/{id}', [PeminjamanController::class, 'show'])->name('peminjaman/show');
 Route::delete('/peminjaman/{id}/delete', [PeminjamanController::class, 'destroy'])->name('peminjaman/delete');
 Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman/store');
+
+Route::get('/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian');
+Route::get('/pengembalian/{id}', [PengembalianController::class, 'show'])->name('pengembalian/kembalikan');
+Route::post('/pengembalian/store', [PengembalianController::class, 'store'])->name('pengembalian/store');
+
 
 });

@@ -74,7 +74,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Komponent:</h6>
                         <a class="collapse-item" href="{{route('peminjaman')}}">Peminjaman Barang</a>
-                        <a class="collapse-item" href="cards.html">Pengembalian Barang</a>
+                        <a class="collapse-item" href="{{route('pengembalian')}}">Pengembalian Barang</a>
                     </div>
                 </div>
             </li>
@@ -284,7 +284,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{auth()->user()->name}}</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{auth()->user()->name}} {{auth()->user()->role}}</span>
                                 <img class="img-profile rounded-circle"
                                     src="{{asset('template/img/undraw_profile.svg')}}">
                             </a>

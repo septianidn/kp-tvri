@@ -9,14 +9,8 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Halaman Peminjaman Barang</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Halaman Pengembalian Barang</h1>
 
-                    <div class="col-lg-8">
-                        <a href="javascript:void(0)" class="btn btn-success mb-2" id="btn-create-post">Tambah +</a>
-                        <div id="read" class="mt-3">
-
-                        </div>
-                    </div>
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
@@ -35,9 +29,7 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endif
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -50,28 +42,23 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endif
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-peminjaman">
-                                       @foreach ($peminjaman as $pjm)
-                                       <tr id="index_{{ $pjm->id }}">
+                                       @foreach ($pengembalian as $pgmb)
+                                       <tr id="index_{{ $pgmb->id }}">
                                         <td id="iterasi">{{$loop->iteration}}</td>
-                                        <td>{{$pjm->name}}</td>
-                                        <td>{{$pjm->acara}}</td>
-                                        <td>{{$pjm->lokasi}}</td>
-                                        <td>{{$pjm->jumlah_barang}}</td>
-                                        <td>{{$pjm->tanggal_peminjaman}}</td>
-                                        <td>{{$pjm->tanggal_pengembalian}}</td>
-                                        <td>{{$pjm->status_peminjaman}}</td>
-                                        @if (auth()->user()->role == "Admin")
+                                        <td>{{$pgmb->name}}</td>
+                                        <td>{{$pgmb->acara}}</td>
+                                        <td>{{$pgmb->lokasi}}</td>
+                                        <td>{{$pgmb->jumlah_barang}}</td>
+                                        <td>{{$pgmb->tanggal_peminjaman}}</td>
+                                        <td>{{$pgmb->tanggal_pengembalian}}</td>
+                                        <td>{{$pgmb->status_peminjaman}}</td>
                                         <td class="text-center">
-                                            <a href="javascript:void(0)" id="btn-delete-post" data-id="{{ $pjm->id }}" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>
-                                            <a href="/peminjaman/detail/{{$pjm->id}}" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>
+                                            <a href="{{url('pengembalian/'.$pgmb->id.'')}}" id="btn-kembali-post" data-id="{{ $pgmb->id }}" class="btn btn-success btn-sm">Kembalikan! &emsp;<i class="fas fa-tasks"></i></a>
                                         </td>
-                                        @endif
                                        </tr>   
                                        @endforeach
                                     </tbody>
@@ -127,69 +114,39 @@
         </div>
     </div>
 
-
-    <!-- Modal Tambah Data -->
-    
-    <div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal Edit Data -->
+<div class="modal fade" id="modal-kembali" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Peminjaman</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Pengembalian Barang</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{{route('peminjaman/store')}}" method="POST">
-                @csrf
-                <div class="alert alert-danger d-none" id="div-validasi">
-                        <ul class="list-unstyled" id="validasi">
-    
-  
 
-                        </ul>
-                </div>
+                <input type="hidden" id="barang_id">
 
-                <div id="date-picker-example" class="md-form md-outline input-with-post-icon datepicker" inline="true">
-                    <label for="example">Tanggal Pengembalian</label>
-                    <i class="fas fa-calendar input-prefix"></i>
-                    <input placeholder="Select date" type="date" id="tanggal" class="form-control">
-                    <input type="text" name="acara" id="acara" placeholder="Acara" class="form-control mt-4">
-                    <input type="text" name="lokasi" id="lokasi" placeholder="Lokasi" class="form-control mt-4">
-                </div>
                 <table class="table table-bordered mt-4">
                     <thead>
-                    <tr>
-                        <th>Unit</th>
+                    <tr><th>No</th>
+                        <th>Barang</th>
                         <th>Jumlah</th>
-                        <th>Aksi</th>
+                        <th>Kondisi</th>
                     </tr>
-                    <tbody id="addBody">
-                        <tr>
-                            <td><select name="barang[]" id="barangSelect" class="selectpicker" data-live-search="true">
-                                <option value="">Pilih Barang</option>
-                                @foreach ($barang as $brg)
-                                    <option value="{{$brg->id}}">{{$brg->nama_barang}}</option>
-                                @endforeach
-                            </select>
-                            <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-nama_barang"></div>
-                            </td>
-                            <td><input type="number" name="qty_barang[]" id="qtySelect" class="form-control" value="1">
-                            <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
-                            </td>
-                            <td><button type="button" class="btn btn-primary" id="add_btn"><i class="fas fa-plus-square"></i></button></td>
-                        </tr>
+                    <tbody id="tabelDetailPengembalian">
+                        
                     </tbody>
                     </thead>
                 </table>
+                
 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
-                <button type="button" class="btn btn-warning" id="clear">CLEAR</button>
-                <button type="submit" class="btn btn-primary" id="store">SIMPAN</button>
+                <button type="button" class="btn btn-primary" id="update">UPDATE</button>
             </div>
-            </form>
         </div>
     </div>
 </div>
@@ -202,7 +159,7 @@
 <script>
     $(document).ready(function () {
         $('select').selectpicker();
-        tampilData();
+        // tampilData();
     });
 var btn_add = false;
 $('#add_btn').on('click', function () {
@@ -284,13 +241,11 @@ function cekNumber(){
                      <td>'+tanggal_peminjaman+'</td>\
                      <td>'+tanggal_pengembalian+'</td>\
                      <td>'+status_peminjaman+'</td>\
-                      @if (auth()->user()->role == "Admin")\
                      <td class="text-center">\
                         {{-- <a href="javascript:void(0)" id="btn-edit-post" data-id='+id+'" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a> --}}\
                         <a href="javascript:void(0)" id="btn-delete-post" data-id='+id+'" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></a>\
                         <a href="/peminjaman/detail/'+id+'" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>\
                     </td>\
-                    @endif\
                     </tr>');
                 });
             }
@@ -380,6 +335,40 @@ function clearForm(){
         });
  tampilData();
     });
+
+    //kembalikan
+    // $('body').on('click', '#btn-kembali-post', function () {
+
+    //     let post_id = $(this).data('id');
+    //     console.log(post_id);
+    //     //fetch detail post with ajax
+    //     $.ajax({
+    //         url: `/pengembalian/${post_id}`,
+    //         type: "GET",
+    //         cache: false,
+    //         success:function(data){
+    //             $.each(data, function (key, value) { 
+    //                  id = data[key].id;
+    //                  nama_barang = data[key].nama_barang;
+    //                  qty = data[key].qty;
+    //                  kondisi = data[key].kondisi;
+    //                  $('#tabelDetailPengembalian').append('<tr>\
+    //                  <td>'+parseInt(key+1)+'</td>\
+    //                  <td>'+nama_barang+'</td>\
+    //                  <td>'+qty+'</td>\
+    //                  <td><select name="kondisi[]" id="kondisi" class="selectpicker" data-live-search="true">\
+    //                          <option value="">Pilih Kondisi</option>\
+    //                          <option value="Baik">Baik</option>\
+    //                          <option value="Rusak">Rusak</option>\
+    //                          <option value="Hilang">Hilang</option>\
+    //                 </select>\
+    //                     </td>\
+    //                 </tr>');
+    //             });
+    //             $('#modal-kembali').modal('show');
+    //         }
+    //     });
+    // });
 
 
     //hapus data
