@@ -25,10 +25,11 @@
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
-                                   
+                                    
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
+                                    @if (!$pengembalian->isEmpty())
                                     <div class="table-responsive">
             <form action="{{route('pengembalian/store')}}" method="POST">
                 @csrf
@@ -39,9 +40,11 @@
 
                         </ul>
                 </div>
-
+                
                 <div id="date-picker-example" class="md-form md-outline input-with-post-icon datepicker" inline="true">
+                    
                     <input type="hidden" id="tid" class="form-control" value="{{$pengembalian[0]->tid}}">
+                    
                     <label for="example">Tanggal Pengembalian</label>
                     <i class="fas fa-calendar input-prefix"></i>
                     <input type="text" id="tanggal" class="form-control" value="{{$pengembalian[0]->tanggal_pengembalian}}" readonly>
@@ -85,6 +88,7 @@
         </div>
         <button type="submit" class="btn btn-primary" name="submit" id="store">Kembalikan Barang</button> 
     </form>
+    @endif
                             </div>
                         </div>
 
@@ -145,7 +149,7 @@
                     showConfirmButton: false,
                     timer: 2000
                 });
-                $(location).attr("href", "pengembalian");
+                $(location).attr("href", "/peminjaman");
                 //clear form
                 //close modal
 

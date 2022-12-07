@@ -75,6 +75,7 @@
                         <h6 class="collapse-header">Komponent:</h6>
                         <a class="collapse-item" href="{{route('peminjaman')}}">Peminjaman Barang</a>
                         <a class="collapse-item" href="{{route('pengembalian')}}">Pengembalian Barang</a>
+                        <a class="collapse-item" href="{{route('history')}}">History Peminjaman</a>
                     </div>
                 </div>
             </li>

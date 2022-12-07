@@ -37,6 +37,7 @@ Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get')
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+Route::get('/history', [PeminjamanController::class, 'history'])->name('history');
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
 Route::get('/peminjaman/get', [PeminjamanController::class, 'get'])->name('peminjaman/get');
 Route::get('/peminjaman/detail/{id}', [PeminjamanController::class, 'show'])->name('peminjaman/show');

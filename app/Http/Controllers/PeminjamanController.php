@@ -17,12 +17,22 @@ class PeminjamanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public static function peminjaman(){
         $barang = Barang::all();
         $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi', 'users.name', 'transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'transaksi.status_peminjaman', 'transaksi.jumlah_barang')->join('users', 'users.id' , '=', 'transaksi.id_peminjam')->get();
 
         return view('peminjaman.index', compact('barang', 'peminjaman'));
+    }
+    public function index()
+    {
+        return $this->peminjaman();
+    }
+
+    public function history()
+    {
+        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi', 'users.name', 'transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'transaksi.status_peminjaman', 'transaksi.jumlah_barang')->join('users', 'users.id' , '=', 'transaksi.id_peminjam')->where('users.id', Auth::user()->id)->get();
+
+        return view('peminjaman.history', compact( 'peminjaman'));
     }
 
     public function get(){
