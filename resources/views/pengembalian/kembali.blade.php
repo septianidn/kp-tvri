@@ -2,6 +2,15 @@
 @section('title', 'Halaman Barang')
 @section('dashboard', 'active')
 
+@section('headeScript')
+    <script>
+        if(performance.navigation.type == 2){
+
+            location.reload(true);
+        }
+    </script>
+@endsection
+
 @section('content')
     <!-- Begin Page Content -->
                 <div class="container-fluid">
@@ -9,8 +18,6 @@
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Halaman Pengembalian Barang</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
 
 
@@ -24,7 +31,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Tabel Pengembalian</h6>
                                     
                                 </div>
                                 <!-- Card Body -->
@@ -57,6 +64,7 @@
                         <th>Barang</th>
                         <th>Jumlah</th>
                         <th>Kondisi</th>
+                        <th>Jumlah Rusak atau Hilang</th>
                     </tr>
                     <tbody id="addBody">
                         @foreach ($pengembalian as $p)
@@ -70,14 +78,17 @@
                             <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
                             </td>
                             <td>
-                                <select name="kondisi[]" id="kondisi">
-                                    <option value="">Pilih Kondisi</option>
+                                <select name="kondisi[]" id="kondisi{{$p->bid}}" data-id="{{$p->bid}}" class="form-control">
+                                    <option value="Baik">Pilih Kondisi</option>
                                     <option value="Baik">Baik</option>
-                                    <option value="Rusak">Rusak</option>
-                                    <option value="Hilang">Hilang</option>
-                                    <option value="Diganti">Diganti</option>
+                                    <option value="Rusak / Hilang">Rusak / Hilang</option> 
                                 </select>
                                 <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-kondisi"></div>
+                            </td>
+                             <td>
+                            <input type="number" name="qty_rusak[]" id="qty_rusak{{$p->bid}}" class="form-control" disabled placeholder="Jumlah Rusak..." min="0" value="0">
+                             <input type="number" name="qty_hilang[]" id="qty_hilang{{$p->bid}}" class="form-control" disabled placeholder="Jumlah Hilang..." min="0" value="0">
+                            <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
                             </td>
                         </tr>
                         @endforeach
@@ -97,10 +108,43 @@
 
 @section('script')
 <script>
+    window.onpageshow = function(event){
+        if(event.persisted){
+            window.location.reload(true);
+        }
+    }
+    var invalidChars = [
+  "-",
+  "+",
+  "e",
+];
+
+$('input[type=number]').on('keydown', function (e) {
+     if (invalidChars.includes(e.key)) {
+    e.preventDefault();
+  }
+});
     $(document).ready(function () {
         $('select').selectpicker();
         $('#dataTable_info').remove();
     });
+
+    $('select[name^="kondisi"]').change(function (e) { 
+        e.preventDefault();
+        let temp_id = $(this).data('id');
+        console.log(temp_id);
+        if($("#kondisi"+temp_id).val() == "Rusak / Hilang"){
+        $("#qty_rusak"+temp_id).prop('disabled', false);
+        $("#qty_hilang"+temp_id).prop('disabled', false);
+        }else{
+        $("#qty_rusak"+temp_id).prop('disabled', true);
+        $("#qty_rusak"+temp_id).val(0);
+        $("#qty_hilang"+temp_id).prop('disabled', true);
+        $("#qty_hilang"+temp_id).val(0);
+        }
+        
+    });
+
     $('#store').click(function(e) {
         $('#div-validasi').removeClass('d-block');
         $('#div-validasi').addClass('d-none');
@@ -109,6 +153,8 @@
         let tid = $('#tid').val();
         let id_barang = [];
         let qty = [];
+        let rusak = [];
+        let hilang = [];
         let kondisi = [];
 
         $("input[name^='idBarang']").each(function () {
@@ -117,6 +163,12 @@
 
         $("input[name^='qty_barang']").each(function () {
             qty.push($(this).val());
+            });
+        $("input[name^='qty_rusak']").each(function () {
+            rusak.push($(this).val());
+            });
+        $("input[name^='qty_hilang']").each(function () {
+            hilang.push($(this).val());
             });
         $("select[name^='kondisi']").each(function () {
             kondisi.push($(this).val());
@@ -137,6 +189,8 @@
                 "transaksi_id": tid,
                 "id_barang": id_barang,
                 "qty": qty,
+                "rusak": rusak,
+                "hilang": hilang,
                 "kondisi": kondisi
             },
             success:function(response){
@@ -149,6 +203,7 @@
                     showConfirmButton: false,
                     timer: 2000
                 });
+                
                 $(location).attr("href", "/peminjaman");
                 //clear form
                 //close modal

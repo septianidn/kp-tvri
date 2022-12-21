@@ -3,11 +3,15 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-xl-10 col-lg-12 col-md-9">
             <div class="card">
                 <div class="card-header">{{ __('Register') }}</div>
 
-                <div class="card-body">
+                <div class="card-body p-0">
+                    <div class="row" style="padding-left: 11px;">
+                        <div class="col-lg-6 d-none d-lg-block bg-login-image" style="background-repeat: no-repeat;opacity: 70%; background-size: 100% 100%; background-image: url({{asset('template/img/tvri-sumbar.jpg')}})"></div>
+                    
+                    <div class="col-lg-6">
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 
@@ -43,7 +47,7 @@
                             <label for="address" class="col-md-4 col-form-label text-md-end">{{ __('Address') }}</label>
 
                             <div class="col-md-6">
-                                <input id="address" type="text" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address') }}" required autocomplete="adress">
+                                    <input id="address" type="text" class="form-control @error('address') is-invalid @enderror" name="address" value="{{ old('address') }}" required autocomplete="adress">
 
                                 @error('address')
                                     <span class="invalid-feedback" role="alert">
@@ -97,6 +101,7 @@
                             </div>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </div>

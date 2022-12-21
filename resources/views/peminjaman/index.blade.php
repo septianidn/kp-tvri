@@ -1,7 +1,7 @@
 
 @extends('template.main')
 @section('title', 'Halaman Peminjaman')
-@section('barang', 'active')
+@section('peminjaman', 'active')
 
 
 @section('content')
@@ -20,7 +20,7 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Tabel Data Barang</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Tabel Peminjaman Barang</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -35,9 +35,8 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endif
+                                            
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -50,12 +49,11 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endif
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-peminjaman">
+                                    @if (!empty($peminjaman))
                                        @foreach ($peminjaman as $pjm)
                                        <tr id="index_{{ $pjm->id }}">
                                         <td id="iterasi">{{$loop->iteration}}</td>
@@ -66,14 +64,15 @@
                                         <td>{{$pjm->tanggal_peminjaman}}</td>
                                         <td>{{$pjm->tanggal_pengembalian}}</td>
                                         <td>{{$pjm->status_peminjaman}}</td>
-                                        @if (auth()->user()->role == "Admin")
                                         <td class="text-center">
+                                            @if (auth()->user()->role == "Admin")
                                             <a href="javascript:void(0)" id="btn-delete-post" data-id="{{ $pjm->id }}" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>
-                                            <a href="/peminjaman/detail/{{$pjm->id}}" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>
+                                            @endif
+                                            <a href="javascript:void(0)" data-id="{{ $pjm->id }}" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>
                                         </td>
-                                        @endif
                                        </tr>   
                                        @endforeach
+                                       @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -254,7 +253,9 @@ function cekNumber(){
     //button create post event
     $('body').on('click', '#btn-create-post', function () {
         cekNumber();
-
+        $('#div-validasi').removeClass('d-block');
+        $('#div-validasi').addClass('d-none');
+        $('#validasi').html('');
         //open modal
         $('#modal-create').modal('show');
     });
@@ -284,13 +285,13 @@ function cekNumber(){
                      <td>'+tanggal_peminjaman+'</td>\
                      <td>'+tanggal_pengembalian+'</td>\
                      <td>'+status_peminjaman+'</td>\
-                      @if (auth()->user()->role == "Admin")\
                      <td class="text-center">\
+                        @if (auth()->user()->role == "Admin")\
                         {{-- <a href="javascript:void(0)" id="btn-edit-post" data-id='+id+'" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a> --}}\
                         <a href="javascript:void(0)" id="btn-delete-post" data-id='+id+'" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></a>\
-                        <a href="/peminjaman/detail/'+id+'" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>\
+                        @endif\
+                        <a href="javascript:void(0)" data-id="'+id+'" id="btn-print-post"  class="btn btn-success btn-sm">PRINT&nbsp;<i class="fas fa-print"></i></a>\
                     </td>\
-                    @endif\
                     </tr>');
                 });
             }
@@ -436,7 +437,62 @@ function clearForm(){
         })
         
     });
+    
+    $('body').on('click', '#btn-print-post', function (e) {
+        e.preventDefault();
+        let post_id = $(this).data('id');
+        let token   = $("meta[name='csrf-token']").attr("content");
+        console.log(post_id);
+        $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
+        Swal.fire({
+            title: 'Cetak Data?',
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Tidak',
+            confirmButtonText: 'Ya, Cetak!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                //fetch to delete data
+                $.ajax({
+
+                    url: `/peminjaman/detail/${post_id}`,
+                    type: "GET",
+                    cache: false,
+                    data: {
+                        "_token": token
+                    },
+                    success:function(response){ 
+
+                        //show success message
+                        window.open(`/peminjaman/detail/${post_id}`, '_blank');
+
+                        
+                    },
+                    
+                    error:function(error){ 
+
+                        //show success message
+                        Swal.fire({
+                            icon: 'error',
+                            title: `${error.responseJSON.message}`,
+                            })
+
+                        
+                    }
+                });
+                tampilData();
+
+                
+            }
+        })
+        
+    });
 </script>
 @endsection
 

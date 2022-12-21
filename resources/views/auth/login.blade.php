@@ -3,12 +3,21 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-xl-10 col-lg-12 col-md-9">
             <div class="card">
                 <div class="card-header">{{ __('Login') }}</div>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
+                <div class="card-body p-0">
+                    <div class="row" style="padding-left: 11px;">
+
+                    
+                    <div class="col-lg-6 d-none d-lg-block bg-login-image" style="background-repeat: no-repeat;opacity: 70%; background-size: 100% 100%; background-image: url({{asset('template/img/tvri-sumbar.jpg')}})"></div>
+                    <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+                                        <form method="POST" action="{{ route('login') }}">
                         @csrf
 
                         <div class="row mb-3">
@@ -65,6 +74,12 @@
                             </div>
                         </div>
                     </form>
+                                    
+                                </div>
+                            </div>
+
+                    
+                    </div>
                 </div>
             </div>
         </div>

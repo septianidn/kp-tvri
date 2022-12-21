@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Barang;
+use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -22,7 +24,9 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index()
-    {
-        return view('dashboard.index');
+    {   $barang = Barang::all();
+        $peminjaman = Peminjaman::where('status_peminjaman', 'Dipinjam');
+        $pengembalian = Peminjaman::where('status_peminjaman', 'Dikembalikan');
+        return view('dashboard.index',compact('barang', 'peminjaman', 'pengembalian'));
     }
 }

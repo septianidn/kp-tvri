@@ -32,9 +32,9 @@
                                             <th>Nama Barang</th>
                                             <th>Jenis</th>
                                             <th>Merk</th>
-                                            <th>Jumlah</th>
-                                            <th>Kondisi</th>
-                                             @if (auth()->user()->role == "Admin")
+                                            <th>Jumlah Barang (Baik ; Rusak ; Hilang)</th>
+                                            @if (auth()->user()->role == "Admin")
+                                            <th>Riwayat Pengeditan</th>
                                             <th>Aksi</th>
                                             @endif
                                         </tr>
@@ -45,23 +45,24 @@
                                             <th>Nama Barang</th>
                                             <th>Jenis</th>
                                             <th>Merk</th>
-                                            <th>Jumlah</th>
-                                            <th>Kondisi</th>
-                                             @if (auth()->user()->role == "Admin")
+                                            <th>Jumlah Barang (Baik ; Rusak ; Hilang)</th>
+                                            @if (auth()->user()->role == "Admin")
+                                            <th>Riwayat Pengeditan</th>
                                             <th>Aksi</th>
                                             @endif
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-barang">
+                                    @if (!empty($barang))
                                        @foreach ($barang as $brg)
                                        <tr id="index_{{ $brg->id }}">
                                         <td id="iterasi">{{$loop->iteration}}</td>
                                         <td>{{$brg->nama_barang}}</td>
                                         <td>{{$brg->jenis}}</td>
                                         <td>{{$brg->merk}}</td>
-                                        <td>{{$brg->qty}}</td>
-                                        <td>{{$brg->kondisi}}</td>
-                                         @if (auth()->user()->role == "Admin")
+                                        <td>{{$brg->jumlah}}pcs</td>
+                                        @if (auth()->user()->role == "Admin")
+                                        <td><a href="barang/{{$brg->id}}/riwayat-edit" id="btn-history-post" data-id="{{ $brg->id }}" class="btn btn-success btn-sm">RIWAYAT&nbsp;<i class="fas fa-edit"></i></a></td>
                                         <td class="text-center">
                                         <a href="javascript:void(0)" id="btn-edit-post" data-id="{{ $brg->id }}" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>
                                         <a href="javascript:void(0)" id="btn-delete-post" data-id="{{ $brg->id }}" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>
@@ -69,6 +70,7 @@
                                         @endif
                                        </tr>   
                                        @endforeach
+                                       @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -160,11 +162,6 @@
                     <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
                 </div>
 
-                <div class="form-group">
-                    <label for="kondisi" class="control-label">Kondisi Barang</label>
-                    <input type="text" class="form-control" id="kondisi" name="kondisi">
-                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-kondisi"></div>
-                </div>
 
             </div>
             <div class="modal-footer">
@@ -185,6 +182,11 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
+            </div>
+            <div class="alert alert-danger d-none" id="div-validasi">
+                        <ul class="list-unstyled" id="validasi">
+
+                        </ul>
             </div>
             <div class="modal-body">
 
@@ -209,16 +211,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="qty_edit" class="control-label">Jumlah</label>
-                    <input type="number" class="form-control" id="qty_edit" name="qty_edit">
-                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty-edit"></div>
+                    <label for="qty_baik" class="control-label">Jumlah Kondisi Baik</label>
+                    <input type="number" class="form-control" id="qty_baik" name="qty_baik">
+                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty-baik"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="kondisi_edit" class="control-label">Kondisi Barang</label>
-                    <input type="text" class="form-control" id="kondisi_edit" name="kondisi_edit">
-                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-kondisi-edit"></div>
+                    <label for="qty_rusak" class="control-label">Jumlah Kondisi Rusak</label>
+                    <input type="number" class="form-control" id="qty_rusak" name="qty_rusak">
+                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty-rusak"></div>
                 </div>
+
+                <div class="form-group">
+                    <label for="qty_hilang" class="control-label">Jumlah Kondisi Hilang</label>
+                    <input type="number" class="form-control" id="qty_hilang" name="qty_hilang">
+                    <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty-hilang"></div>
+                </div>
+
                 
 
             </div>
@@ -229,6 +238,7 @@
         </div>
     </div>
 </div>
+
 
 @endsection
 
@@ -266,7 +276,7 @@ $('input[type=number]').on('keydown', function (e) {
                      nama_barang = data[key].nama_barang;
                      jenis = data[key].jenis;
                      merk = data[key].merk;
-                     qty = data[key].qty;
+                     qty = data[key].jumlah;
                      kondisi = data[key].kondisi;
                      $('tbody').append('<tr>\
                      <td>'+parseInt(key+1)+'</td>\
@@ -274,8 +284,8 @@ $('input[type=number]').on('keydown', function (e) {
                      <td>'+jenis+'</td>\
                      <td>'+merk+'</td>\
                      <td>'+qty+'</td>\
-                     <td>'+kondisi+'</td>\
-                      @if (auth()->user()->role == "Admin")\
+                     @if (auth()->user()->role == "Admin")\
+                     <td><a href="barang/'+id+'/riwayat-edit" id="btn-history-post" data-id="'+id+'" class="btn btn-success btn-sm">RIWAYAT&nbsp;<i class="fas fa-edit"></i></a></td>\
                      <td class="text-center">\
                         <a href="javascript:void(0)" id="btn-edit-post" data-id='+id+'" class="btn btn-primary btn-sm">EDIT&nbsp;<i class="fas fa-edit"></i></a>\
                         <a href="javascript:void(0)" id="btn-delete-post" data-id='+id+'" class="btn btn-danger btn-sm">DELETE&nbsp;<i class="fas fa-trash"></i></i></a>\
@@ -296,7 +306,6 @@ $('input[type=number]').on('keydown', function (e) {
         let jenis   = $('#jenis').val();
         let merk   = $('#merk').val();
         let qty   = $('#qty').val();
-        let kondisi   = $('#kondisi').val();
         let token   = $("meta[name='csrf-token']").attr("content");
 
         $.ajaxSetup({
@@ -315,7 +324,6 @@ $('input[type=number]').on('keydown', function (e) {
                 "jenis": jenis,
                 "merk": merk,
                 "qty": qty,
-                "kondisi": kondisi,
                 "token": token
             },
             success:function(response){
@@ -342,7 +350,6 @@ $('input[type=number]').on('keydown', function (e) {
 
             },
             error:function(error){
-                console.log(error.responseJSON);
                 if(error.responseJSON.nama_barang[0]) {
 
                     //show alert
@@ -401,23 +408,26 @@ tampilData();
     //edit data
 
     $('body').on('click', '#btn-edit-post', function () {
-
+        $('#div-validasi').removeClass('d-block');
+        $('#div-validasi').addClass('d-none');
+        $('#validasi').html('');
         let post_id = $(this).data('id');
-
+        console.log(post_id);
         //fetch detail post with ajax
         $.ajax({
             url: `/barang/${post_id}`,
             type: "GET",
             cache: false,
             success:function(response){
-
                 //fill data to form
+                console.log(response.data);
                 $('#barang_id').val(response.data.id);
                 $('#barang_edit').val(response.data.nama_barang);
                 $('#jenis_edit').val(response.data.jenis);
                 $('#merk_edit').val(response.data.merk);
-                $('#qty_edit').val(response.data.qty);
-                $('#kondisi_edit').val(response.data.kondisi);
+                $('#qty_baik').val(response.data.baik.jumlah);
+                $('#qty_rusak').val(response.data.rusak.jumlah);
+                $('#qty_hilang').val(response.data.hilang.jumlah);
 
                 //open modal
                 $('#modal-edit').modal('show');
@@ -428,14 +438,18 @@ tampilData();
     //action update barang
     $('#update').click(function(e) {
         e.preventDefault();
-
         //define variable
+        $('#div-validasi').removeClass('d-block');
+        $('#div-validasi').addClass('d-none');
+        $('#validasi').html('');
         let post_id = $('#barang_id').val();
+        console.log(post_id);
         let barang   = $('#barang_edit').val();
         let jenis = $('#jenis_edit').val();
         let merk = $('#merk_edit').val();
-        let qty = $('#qty_edit').val();
-        let kondisi = $('#kondisi_edit').val();
+        let baik = $('#qty_baik').val();
+        let rusak = $('#qty_rusak').val();
+        let hilang = $('#qty_hilang').val();
         let token   = $("meta[name='csrf-token']").attr("content");
         
         $.ajaxSetup({
@@ -453,8 +467,9 @@ tampilData();
                 "nama_barang": barang,
                 "jenis": jenis,
                 "merk": merk,
-                "qty": qty,
-                "kondisi": kondisi,
+                "baik": baik,
+                "rusak": rusak,
+                "hilang": hilang,
                 "token": token
             },
             success:function(response){
@@ -475,54 +490,61 @@ tampilData();
             },
             error:function(error){
                 
-                if(error.responseJSON.nama_barang[0]) {
+                $('#div-validasi').removeClass('d-none');
+                $('#div-validasi').addClass('d-block');
+                $.each(error.responseJSON, function (key, valuue) { 
+                     
+                $('#validasi').append('<li>'+error.responseJSON[key]+'</li>')
+                });
 
-                    //show alert
-                    $('#alert-barang-edit').removeClass('d-none');
-                    $('#alert-barang-edit').addClass('d-block');
+                // if(error.responseJSON.nama_barang[0]) {
 
-                    //add message to alert
-                    $('#alert-barang-edit').html(error.responseJSON.nama_barang[0]);
-                } 
+                //     //show alert
+                //     $('#alert-barang-edit').removeClass('d-none');
+                //     $('#alert-barang-edit').addClass('d-block');
 
-                if(error.responseJSON.jenis[0]) {
+                //     //add message to alert
+                //     $('#alert-barang-edit').html(error.responseJSON.nama_barang[0]);
+                // } 
 
-                    //show alert
-                    $('#alert-jenis-edit').removeClass('d-none');
-                    $('#alert-jenis-edit').addClass('d-block');
+                // if(error.responseJSON.jenis[0]) {
 
-                    //add message to alert
-                    $('#alert-jenis-edit').html(error.responseJSON.jenis[0]);
-                }
+                //     //show alert
+                //     $('#alert-jenis-edit').removeClass('d-none');
+                //     $('#alert-jenis-edit').addClass('d-block');
+
+                //     //add message to alert
+                //     $('#alert-jenis-edit').html(error.responseJSON.jenis[0]);
+                // }
                 
-                if(error.responseJSON.merk[0]) {
+                // if(error.responseJSON.merk[0]) {
 
-                    //show alert
-                    $('#alert-merk-edit').removeClass('d-none');
-                    $('#alert-merk-edit').addClass('d-block');
+                //     //show alert
+                //     $('#alert-merk-edit').removeClass('d-none');
+                //     $('#alert-merk-edit').addClass('d-block');
 
-                    //add message to alert
-                    $('#alert-merk-edit').html(error.responseJSON.merk[0]);
-                }
+                //     //add message to alert
+                //     $('#alert-merk-edit').html(error.responseJSON.merk[0]);
+                // }
                 
-                if(error.responseJSON.qty[0]) {
+                // if(error.responseJSON.qty[0]) {
 
-                    //show alert
-                    $('#alert-qty-edit').removeClass('d-none');
-                    $('#alert-qty-edit').addClass('d-block');
+                //     //show alert
+                //     $('#alert-qty-edit').removeClass('d-none');
+                //     $('#alert-qty-edit').addClass('d-block');
 
-                    //add message to alert
-                    $('#alert-qty-edit').html(error.responseJSON.qty[0]);
-                }
-                if(error.responseJSON.kondisi[0]) {
+                //     //add message to alert
+                //     $('#alert-qty-edit').html(error.responseJSON.qty[0]);
+                // }
+                // if(error.responseJSON.kondisi[0]) {
 
-                    //show alert
-                    $('#alert-kondisi-edit').removeClass('d-none');
-                    $('#alert-kondisi-edit').addClass('d-block');
+                //     //show alert
+                //     $('#alert-kondisi-edit').removeClass('d-none');
+                //     $('#alert-kondisi-edit').addClass('d-block');
 
-                    //add message to alert
-                    $('#alert-kondisi-edit').html(error.responseJSON.kondisi[0]);
-                }
+                //     //add message to alert
+                //     $('#alert-kondisi-edit').html(error.responseJSON.kondisi[0]);
+                // }
 
             }
 

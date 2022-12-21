@@ -79,5 +79,24 @@
             @yield('content')
         </main>
     </div>
+@include('template.scripts')  
+<script>
+        var invalidChars = [
+  "-",
+  "+",
+  "e",
+];
+
+$('input[type=number]').on('keydown', function (e) {
+     if (invalidChars.includes(e.key)) {
+    e.preventDefault();
+  }
+});
+window.onpageshow = function(event){
+        if(event.persisted){
+            window.location.reload(true);
+        }
+    }
+    </script>
 </body>
 </html>

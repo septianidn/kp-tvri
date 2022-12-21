@@ -25,7 +25,7 @@
     <link href="{{asset('template/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('template/bootstrap-select.min.css')}}">
 
-
+    @yield('headerScript')
 
 </head>
 
@@ -42,7 +42,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">SB Admin <sup>2</sup></div>
+                <div class="sidebar-brand-text mx-3">TVRI<sup></sup></div>
             </a>
 
             <!-- Divider -->
@@ -86,7 +86,7 @@
             <div class="sidebar-heading">
                 Inventory
             </div>
-
+            
             <!-- Nav Item - Tables -->
             <li class="nav-item @yield('barang')">
                 <a class="nav-link" href="{{route('barang')}}">
@@ -122,7 +122,7 @@
                     </form>
 
                     <!-- Topbar Search -->
-                    <form
+                    {{-- <form
                         class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
                             <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
@@ -133,13 +133,13 @@
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form> --}}
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
                         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                        <li class="nav-item dropdown no-arrow d-sm-none">
+                        {{-- <li class="nav-item dropdown no-arrow d-sm-none">
                             <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-search fa-fw"></i>
@@ -160,10 +160,10 @@
                                     </div>
                                 </form>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
+                        {{-- <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-bell fa-fw"></i>
@@ -211,10 +211,10 @@
                                 </a>
                                 <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <!-- Nav Item - Messages -->
-                        <li class="nav-item dropdown no-arrow mx-1">
+                        {{-- <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-envelope fa-fw"></i>
@@ -277,7 +277,7 @@
                                 </a>
                                 <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
                             </div>
-                        </li>
+                        </li> --}}
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 

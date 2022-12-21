@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
-use App\Models\DetailPeminjaman;
 use App\Models\Peminjaman;
+use App\Models\BarangDetail;
 use Illuminate\Http\Request;
+use App\Models\DetailPeminjaman;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -66,7 +67,12 @@ class PeminjamanController extends Controller
         // return response()->json($jumlah,422);
         
          
-
+        
+        if((time()-(60*60*24)) > strtotime($request->tanggal)){
+            return response()->json([
+                'message' => 'Tanggal tidak boleh sebelum tanggal sekarang!' 
+            ],422);
+        }
         $rules = array(
             'tanggal' => 'required|date',
             'acara' => 'required|max:50',
@@ -93,7 +99,7 @@ class PeminjamanController extends Controller
         }
         foreach ($request->qty as $key => $brg) {
             $qty = $brg;
-            $stok = Barang::select('barang.qty','barang.nama_barang')->where('id', '=', $request->nama_barang[$key])->first();
+            $stok = BarangDetail::select('barang_detail.jumlah','barang.nama_barang')->where('barang.id', '=', $request->nama_barang[$key])->where('keterangan' , 'Baik')->join('barang', 'barang.id' , '=', 'barang_detail.barang_id')->first();
             
             if(!$stok->exists()){
                 return response()->json([
@@ -101,12 +107,12 @@ class PeminjamanController extends Controller
             ],422);
             }
             
-            if($stok->qty == 0){
+            if($stok->jumlah == 0){
                 return response()->json([
                 'message' => 'Jumlah barang '.$stok->nama_barang.' Kosong!' 
             ],422);
             }
-            if($request->qty[$key] > $stok->qty){
+            if($request->qty[$key] > $stok->jumlah){
                 
                 return response()->json([
                 'message' => 'Jumlah barang '.$stok->nama_barang.' tidak mencukupi!' 
@@ -133,9 +139,9 @@ class PeminjamanController extends Controller
         $jumlah = [];
         foreach($request->nama_barang as $key => $barang){
                $jumlah[$barang] = ['jumlah' => $request->qty[$key], 'keterangan' => '-'];
-               Barang::where('id', $barang)->decrement('qty', $request->qty[$key]);
+               BarangDetail::where('barang_id', $barang)->where('keterangan', 'Baik')->decrement('jumlah', $request->qty[$key]);
             }
-            $detailPeminjaman->barang()->attach($jumlah);
+        $detailPeminjaman->barang()->attach($jumlah);
 
         
 
@@ -154,7 +160,27 @@ class PeminjamanController extends Controller
      */
     public function show($id)
     {
-        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi','transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'detail_transaksi.keterangan', 'barang.kondisi', 'users.name', 'detail_transaksi.jumlah')->join('users', 'users.id', '=', 'transaksi.id_peminjam')->join('detail_transaksi', 'transaksi.id', '=', 'detail_transaksi.transaksi_id')->join('barang' , 'barang.id', '=', 'detail_transaksi.barang_id')->get();
+        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi','transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'detail_transaksi.keterangan',  'users.name', 'detail_transaksi.jumlah')->join('users', 'users.id', '=', 'transaksi.id_peminjam')->join('detail_transaksi', 'transaksi.id', '=', 'detail_transaksi.transaksi_id')->join('barang' , 'barang.id', '=', 'detail_transaksi.barang_id')->where('users.id', Auth::user()->id)->where('status_peminjaman', 'Dipinjam')->where('transaksi.id', $id)->get();
+        
+        if (count($peminjaman)==0){
+            return response()->json([
+            'success' => false,
+            'message' => 'Tidak dapat mencetak!'
+        ], 404); 
+        }
+
+        return view('peminjaman.cetak', compact('peminjaman'));
+    }
+    public function cetak($id)
+    {
+        $peminjaman = Peminjaman::select('transaksi.id', 'transaksi.acara', 'transaksi.lokasi','transaksi.tanggal_pengembalian', 'transaksi.tanggal_peminjaman', 'barang.nama_barang', 'barang.merk', 'detail_transaksi.keterangan', 'barang.kondisi', 'users.name', 'detail_transaksi.jumlah')->join('users', 'users.id', '=', 'transaksi.id_peminjam')->join('detail_transaksi', 'transaksi.id', '=', 'detail_transaksi.transaksi_id')->join('barang' , 'barang.id', '=', 'detail_transaksi.barang_id')->where('users.id', Auth::user()->id)->where('status_peminjaman', 'Dipinjam')->where('transaksi.id', $id)->get();
+
+        if (count($peminjaman)==0){
+            return response()->json([
+            'success' => false,
+            'message' => 'Tidak dapat mencetak!'
+        ], 404); 
+        }
 
         return view('peminjaman.cetak', compact('peminjaman'));
     }
@@ -191,6 +217,9 @@ class PeminjamanController extends Controller
     public function destroy($id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
+        $barang = $peminjaman->barang[0];
+        $jumlah =  $peminjaman->barang[0]->detail_transaksi->jumlah;
+        BarangDetail::where('barang_id', $barang->id)->where('keterangan', 'Baik')->increment('jumlah', $jumlah);
         $peminjaman->barang()->detach();
         $peminjaman->delete();
         

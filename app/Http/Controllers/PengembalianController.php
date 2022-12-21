@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\PeminjamanController;
+use App\Models\BarangDetail;
 
 class PengembalianController extends Controller
 {
@@ -41,11 +42,25 @@ class PengembalianController extends Controller
      */
     public function store(Request $request)
     {
+        
         $detailPeminjaman = Peminjaman::findOrFail($request->transaksi_id);
         $jumlah = [];
         foreach($request->id_barang as $key => $barang){
+                $rusak = 0;
+                $hilang = 0;
+                if($request->rusak[$key] != "") $rusak = $request->rusak[$key];
+                if($request->hilang[$key] != "") $hilang = $request->hilang[$key];
+
+                if($request->qty[$key] < ( $rusak + $hilang)){
+                    return response()->json([
+                    'message' => 'Jumlah barang Rusak/Hilang melebihi jumlah awal!' 
+                ],422);
+                }
+                $stokIncrement = $request->qty[$key] - $rusak - $hilang;
                $jumlah[$barang] = ['jumlah' => $request->qty[$key], 'keterangan' => $request->kondisi[$key], 'jenis_transaksi' => 'pengembalian'];
-               Barang::where('id', $barang)->increment('qty', $request->qty[$key]);
+               BarangDetail::where('barang_id', $barang)->where('keterangan', 'Baik')->increment('jumlah', $stokIncrement);
+               BarangDetail::where('barang_id', $barang)->where('keterangan', 'Rusak')->increment('jumlah', $rusak);
+               BarangDetail::where('barang_id', $barang)->where('keterangan', 'Hilang')->increment('jumlah', $hilang);
             }
             
             $detailPeminjaman->status_peminjaman = 'Dikembalikan';

@@ -20,7 +20,7 @@ use App\Http\Controllers\PengembalianController;
 Auth::routes();
 Route::get('/logout', function(){
     return abort(404);
-})->name('logout');
+});
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('dashboard');
 Route::get('/barang', [BarangController::class, 'index'])->name('barang');
@@ -29,6 +29,7 @@ Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get')
     Route::middleware(['is_admin'])->group(function () {
         Route::post('/barang', [BarangController::class, 'store'])->name('barang/store');
         Route::get('/barang/{id}', [BarangController::class, 'show'])->name('/barang/edit');
+        Route::get('/barang/{id}/riwayat-edit', [BarangController::class, 'history'])->name('/barang/history-edit');
         Route::put('/barang/{id}/edit', [BarangController::class, 'update'])->name('/barang/update');
         Route::delete('/barang/{id}/delete', [BarangController::class, 'destroy'])->name('/barang/delete');
     });
@@ -45,6 +46,7 @@ Route::get('/history', [PeminjamanController::class, 'history'])->name('history'
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
 Route::get('/peminjaman/get', [PeminjamanController::class, 'get'])->name('peminjaman/get');
 Route::get('/peminjaman/detail/{id}', [PeminjamanController::class, 'show'])->name('peminjaman/show');
+Route::get('/peminjaman/cetak/{id}', [PeminjamanController::class, 'show'])->name('peminjaman/show');
 Route::delete('/peminjaman/{id}/delete', [PeminjamanController::class, 'destroy'])->name('peminjaman/delete');
 Route::post('/peminjaman/store', [PeminjamanController::class, 'store'])->name('peminjaman/store');
 

@@ -1,7 +1,7 @@
 
 @extends('template.main')
-@section('title', 'History Peminjaman')
-@section('peminjaman', 'active')
+@section('title', 'History Pengeditan Barang')
+@section('barang', 'active')
 
 
 @section('content')
@@ -22,41 +22,26 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama Peminjam</th>
-                                            <th>Acara</th>
-                                            <th>Lokasi</th>
-                                            <th>Jumlah</th>
-                                            <th>Tanggal Peminjaman</th>
-                                            <th>Tanggal Pengembalian</th>
-                                            <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
-                                            <th>Aksi</th>
-                                            @endif
+                                            <th>Nama Barang</th>
+                                            <th>Tanggal</th>
+                                            <th>Keterangan</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nama Peminjam</th>
-                                            <th>Acara</th>
-                                            <th>Lokasi</th>
-                                            <th>Jumlah</th>
-                                            <th>Tanggal Peminjaman</th>
-                                            <th>Tanggal Pengembalian</th>
-                                            <th>Status</th>
+                                            <th>Nama Barang</th>
+                                            <th>Tanggal</th>
+                                            <th>Keterangan</th>
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-peminjaman">
-                                       @foreach ($peminjaman as $pjm)
-                                       <tr id="index_{{ $pjm->id }}">
+                                       @foreach ($barang as $b)
+                                       <tr>
                                         <td id="iterasi">{{$loop->iteration}}</td>
-                                        <td>{{$pjm->name}}</td>
-                                        <td>{{$pjm->acara}}</td>
-                                        <td>{{$pjm->lokasi}}</td>
-                                        <td>{{$pjm->jumlah_barang}}</td>
-                                        <td>{{$pjm->tanggal_peminjaman}}</td>
-                                        <td>{{$pjm->tanggal_pengembalian}}</td>
-                                        <td>{{$pjm->status_peminjaman}}</td>
+                                        <td>{{$b->nama_barang}}</td>
+                                        <td>{{$b->tanggal}}</td>
+                                        <td>{{$b->keterangan}} barang yang {{$b->tipe}} sebanyak {{$b->jumlah}}</td>
                                        </tr>   
                                        @endforeach
                                     </tbody>
