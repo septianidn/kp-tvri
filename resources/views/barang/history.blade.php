@@ -17,6 +17,7 @@
                             <h6 class="m-0 font-weight-bold text-primary">Tabel History Peminjaman</h6>
                         </div>
                         <div class="card-body">
+                            <a href="{{route('barang')}}" class="btn btn-primary">Kembali</a>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>

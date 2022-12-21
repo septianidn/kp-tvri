@@ -79,8 +79,7 @@ class PeminjamanController extends Controller
             'lokasi' => 'required|max:50',
             'nama_barang' => 'required|min:1',
             'nama_barang.*' => 'distinct|min:1',
-            'qty.*' => 'min:1',
-            'qty' => 'required|min:1',
+            'qty.*' => 'numeric|min:1',
         );    
         $messages = array(
             'acara.required' => 'Masukkan Acara!',
@@ -88,7 +87,8 @@ class PeminjamanController extends Controller
             'nama_barang' => 'Silahkan Pilih Item yang akan dipinjam!.',
             'nama_barang.*.distinct' => 'Silahkan Pilih Item yang Berbeda!.',
             'nama_barang.*.min' => 'Silahkan Pilih Item yang akan dipinjam!.',
-            'qty.*.min' => 'Masukkan Jumlah unit yang akan dipinjam!.',
+            'qty.*.min' => 'Masukkan Jumlah unit minimal 1',
+            'qty.*' => 'Masukkan angka valid',
             'tanggal.required' => 'Masukkan Tanggal!' 
             
         );

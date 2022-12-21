@@ -29,9 +29,7 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
-                                            @if (auth()->user()->role == "Admin")
                                             <th>Aksi</th>
-                                            @endif
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -44,6 +42,7 @@
                                             <th>Tanggal Peminjaman</th>
                                             <th>Tanggal Pengembalian</th>
                                             <th>Status</th>
+                                            <th>Aksi</th>
                                         </tr>
                                     </tfoot>
                                     <tbody id="table-peminjaman">

@@ -173,7 +173,7 @@
                             </select>
                             <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-nama_barang"></div>
                             </td>
-                            <td><input type="number" name="qty_barang[]" id="qtySelect" class="form-control" value="1">
+                            <td><input type="number" name="qty_barang[]" id="qtySelect" class="form-control" value="1" min="1">
                             <div class="alert alert-danger mt-2 d-none" role="alert" id="alert-qty"></div>
                             </td>
                             <td><button type="button" class="btn btn-primary" id="add_btn"><i class="fas fa-plus-square"></i></button></td>
