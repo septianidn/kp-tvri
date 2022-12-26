@@ -23,6 +23,7 @@ Route::get('/logout', function(){
 });
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/api/chart-data', [HomeController::class, 'get'])->name('grafik');
 Route::get('/barang', [BarangController::class, 'index'])->name('barang');
 Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get');
 

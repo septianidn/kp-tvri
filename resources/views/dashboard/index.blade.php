@@ -108,7 +108,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Grafik Peminjaman</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -126,8 +126,8 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                    <div class="chart-area" style="position: relative; height:40vh; width:80vw">
+                                        <canvas id="bar" width="400" height="400"></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -158,20 +158,10 @@
                                 <!-- Card Body -->
                                 <div class="card-body">
                                     <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
+                                        <canvas id="pie"></canvas>
                                     </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Direct
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Social
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Referral
-                                        </span>
-                                    </div>
-                                </div>
+                                    <p class="dipinjam"></p>
+                                    <p class="dikembalian"></p>
                             </div>
                         </div>
                     </div>
@@ -183,6 +173,73 @@
         if(event.persisted){
             window.location.reload(true);
         }
+
+    $(document).ready(function () {
+            $.ajax({
+    url: '/api/chart-data',
+    method: 'GET',
+    success: function(data) {
+        var obj1 = data[0];
+        var obj2 = data[1];
+        var labels = [];
+        var values = [];
+        var status = [];
+        var jumlah = [];
+
+        // Iterate over the data collection and extract the labels and values
+        obj1.forEach(function(item) {
+            labels.push(item.monthname);
+            values.push(item.count);
+        });
+        obj2.forEach(function(item) {
+            status.push(item.status);
+            jumlah.push(item.count);
+            console.log(status);
+        });
+
+
+        // Create the chart using the labels and values extracted from the data collection
+        var ctx = document.getElementById('bar').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Peminjaman pada tahun '+obj1[0].year,
+                    data: values,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                    beginAtZero: true
+                    }
+                },
+                responsive: true,
+            }
+        });
+
+        var pie = document.getElementById('pie').getContext('2d');
+        var myChart = new Chart(pie, {
+            type : 'pie',
+        	data : {
+        		labels : status,
+        		datasets : [ {
+        			backgroundColor : [ "#51EAEA", "#FCDDB0"],
+        			data : jumlah
+        		} ]
+        	},
+        	options : {
+        		title : {
+        			display : true,
+        			text : 'Chart JS Pie Chart Example'
+        		}
+        	}
+        });
+    }   
+});
+        });
     }
     </script>
 @endsection
