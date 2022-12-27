@@ -6,8 +6,9 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Halaman Profil</h1>
+                    <h1 class="h3 mb-0 text-gray-800">Halaman Profil</h1>
+                    <div class="d-sm-flex align-items-center justify-content-end mb-4">
+                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-warning shadow-sm" id="ubahPassword"><i class="fas fa-edit"></i> Ubah Password</a>|
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" id="ubahProfil"><i class="fas fa-edit"></i> Ubah Data</a>
                     </div>
 
@@ -35,6 +36,73 @@
                     <button type="submit" class="btn btn-primary" id="save">Save Changes</button>
                     <button type="submit" class="btn btn-warning" id="cancel">Cancel</button>
                     </form>
+
+<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                {{Form::open(array('url' => '/profil/change-password'))}}
+<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<div class="alert alert-danger d-none" id="div-validasi">
+                        <ul class="list-unstyled" id="validasi">
+    
+  
+
+                        </ul>
+                </div>
+<div class="form-group">
+
+    <div class="row">
+        <div class="col">
+            <label for="password" class="control-label">Current Password</label>
+        </div>
+        <div class="col">
+            {{Form::password('password', array('id' => 'password', 'class' => 'form-control', 'placeholder' => 'Password'))}}
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col">
+            <label for="new-password" class="control-label">New Password</label>
+        </div>
+        <div class="col">
+            {{Form::password('new-password', array('id' => 'new-password', 'class' => 'form-control', 'placeholder' => 'New Password'))}}
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="row">
+        <div class="col">
+            <label for="new-password-confirmation" class="control-label">Re-enter
+                Password</label>
+        </div>
+        <div class="col">
+            {{Form::password('new-password-confirmation', array('id' => 'new-password-confirmation', 'class' => 'form-control', 'placeholder' => 'Confirm Password'))}}
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">TUTUP</button>
+    <button type="submit" class="btn btn-danger" id="btnEditPassword">Ubah Password</button>
+</div>
+{{Form::close()}}
+
+
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 
@@ -159,6 +227,78 @@
 
         });
 tampilData();
+    });
+
+    $('body').on('click', '#ubahPassword', function () {
+        $('#div-validasi').removeClass('d-block');
+        $('#div-validasi').addClass('d-none');
+        $('#validasi').html('');
+        //open modal
+        $('#modal-create').modal('show');
+    });
+
+    $('#btnEditPassword').click(function(e) {
+        $('#div-validasi').removeClass('d-block');
+        $('#div-validasi').addClass('d-none');
+        $('#validasi').html('');
+        e.preventDefault();
+
+        //define variable
+        let password_lama   = $('#password').val();
+        let password_baru   = $('#new-password').val();
+        let password_baru_konfirmasi   = $('#new-password-confirmation').val();
+        let token   = $("meta[name='csrf-token']").attr("content");
+        console.log(password_baru);
+        $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        //ajax
+        $.ajax({
+
+            url: `/profil/change-password`,
+            type: "POST",
+            cache: false,
+            data: {
+                "password": password_lama,
+                "new_password": password_baru,
+                "new_password_confirmation": password_baru_konfirmasi,
+                
+                "token": token
+            },
+            success:function(response){
+
+                //show success message
+                Swal.fire({
+                    type: 'success',
+                    icon: 'success',
+                    title: `${response.message}`,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                
+                //clear form
+                $('#password').val('');
+                $('#new-password').val('');
+                $('#new-password-confirmation').val('');
+
+                //close modal
+                $('#modal-create').modal('hide');
+                
+
+            },
+            error:function(error){
+                $('#div-validasi').removeClass('d-none');
+                $('#div-validasi').addClass('d-block');
+                $.each(error.responseJSON, function (key, valuue) { 
+                     
+                $('#validasi').append('<li>'+error.responseJSON[key]+'</li>')
+                });
+
+            }
+
+        });
     });
 </script>
 @endsection

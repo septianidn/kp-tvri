@@ -40,6 +40,7 @@ Route::get('/barang/get', [BarangController::class, 'get'])->name('/barang/get')
     Route::put('/profil/{id}/edit', [App\Http\Controllers\ProfilController::class, 'update'])->name('profil/edit');
     Route::get('/profil/{id}/get', [App\Http\Controllers\ProfilController::class, 'get'])->name('profil/get');
 Route::get('/profil', [App\Http\Controllers\ProfilController::class, 'index'])->name('profil');
+Route::post('/profil/change-password', [App\Http\Controllers\ProfilController::class, 'changePassword'])->name('edit-password');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

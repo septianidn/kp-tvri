@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             'address' => 'Padang',
             'role' => 'Admin',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('draw7437'),
+            'password' => Hash::make('admin123'),
         ]);
     }
 }
