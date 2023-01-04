@@ -20,6 +20,7 @@ class CreateDetailTransaksiTable extends Migration
             $table->integer('jumlah'); 
             $table->string('keterangan')->nullable();
             $table->string('jenis_transaksi')->nullable()->default('peminjaman');
+            $table->date('tanggal_transaksi');
             $table->foreign('transaksi_id')->references('id')->on('transaksi')
             ->onDelete('cascade')->onUpdate('cascade'); 
             $table->foreign('barang_id')->references('id')->on('barang')

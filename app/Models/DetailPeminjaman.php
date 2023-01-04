@@ -10,7 +10,7 @@ class DetailPeminjaman extends Pivot
 {
     protected $table = 'detail_transaksi';
 
-    protected $fillable = ['barang_id', 'transaksi_id', 'jumlah', 'kondisi', 'keterangan'];
+    protected $fillable = ['barang_id', 'transaksi_id', 'jumlah', 'jenis_transaksi','tanggal_transaksi', 'keterangan'];
     
 
 

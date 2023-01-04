@@ -57,7 +57,7 @@ class PengembalianController extends Controller
                 ],422);
                 }
                 $stokIncrement = $request->qty[$key] - $rusak - $hilang;
-               $jumlah[$barang] = ['jumlah' => $request->qty[$key], 'keterangan' => $request->kondisi[$key], 'jenis_transaksi' => 'pengembalian'];
+               $jumlah[$barang] = ['jumlah' => $request->qty[$key], 'keterangan' => $request->kondisi[$key], 'jenis_transaksi' => 'pengembalian', 'tanggal_transaksi' =>  date('Y-m-d')];
                BarangDetail::where('barang_id', $barang)->where('keterangan', 'Baik')->increment('jumlah', $stokIncrement);
                BarangDetail::where('barang_id', $barang)->where('keterangan', 'Rusak')->increment('jumlah', $rusak);
                BarangDetail::where('barang_id', $barang)->where('keterangan', 'Hilang')->increment('jumlah', $hilang);
